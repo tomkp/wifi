@@ -1,0 +1,31 @@
+{
+  "name": "wifi",
+  "version": "1.0.0",
+  "description": "wifi application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tomkp/wifi.git"
+  },
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/tomkp/wifi/issues"
+  },
+  "homepage": "https://github.com/tomkp/wifi#readme",
+  "devDependencies": {
+    "electron-prebuilt": "^1.0.1"
+  },
+  "dependencies": {
+    "split": "^1.0.0"
+  }
+}
