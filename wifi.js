@@ -24,12 +24,12 @@ const poll = () => {
                 events.emit('off')
                 return
             }
-            const rssi = Number(data.agrCtlRSSI)
-            const noise = Number(data.agrCtlNoise)
             if (!data.SSID) {
                 events.emit('not-connected')
                 return
             }
+            const rssi = Number(data.agrCtlRSSI)
+            const noise = Number(data.agrCtlNoise)
             events.emit('data', {rssi, noise, ssid: data.SSID})
         })
 }
