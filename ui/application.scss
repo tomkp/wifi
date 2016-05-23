@@ -91,3 +91,14 @@ section {
 .snr {
 }
 
+@media screen and (orientation:landscape) {
+
+  section {
+    font-size: 10vh;
+  }
+
+  .label {
+    font-size: 5vh;
+  }
+}
+
