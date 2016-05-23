@@ -60,6 +60,12 @@ body {
   flex-direction: column;
 }
 
+.values {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+}
+
 section {
 
   font-size: 20vmin;
@@ -99,6 +105,13 @@ section {
 
   .label {
     font-size: 5vh;
+  }
+
+
+  .values {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
   }
 }
 

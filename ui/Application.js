@@ -36,9 +36,11 @@ const Display = ({status, ssid, rssi, noise, quality}) => {
     return (
         <div className="display">
             <Ssid name={ssid}/>
-            <Signal value={rssi}/>
-            <Noise value={noise}/>
-            <Quality value={quality}/>
+            <div className="values">
+                <Signal value={rssi}/>
+                <Noise value={noise}/>
+                <Quality value={quality}/>
+            </div>
         </div>
     )
 }
