@@ -64,16 +64,12 @@ const wifi = require('./wifi')
 const monitor = (win) => {
 wifi
     .on('off', () => {
-      console.log(`off`);
       win.webContents.send('off', 'off');
     })
     .on('not-connected', () => {
-      console.log(`not-connected`);
       win.webContents.send('not-connected', 'not-connected');
     })
     .on('data', ({rssi, noise, ssid}) => {
-      //console.clear()
-      //console.log(`data ${rssi + 100}, ${noise + 100}, ${ssid}`);
       win.webContents.send('data', {rssi, noise, ssid});
     })
 }
