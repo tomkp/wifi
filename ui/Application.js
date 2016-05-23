@@ -22,14 +22,13 @@ const toColor = (value, threshold) => {
     return '#' + col
 }
 
-const Display = ({rssi, noise, ssid}) => {
-    const snr = Math.abs(noise - rssi);
+const Display = ({ssid, rssi, noise, quality}) => {
     return (
         <div className="display">
             <Ssid name={ssid} />
-            <Signal value={100 + rssi} />
-            <Noise value={100 + noise} />
-            <Snr value={snr} />
+            <Signal value={rssi} />
+            <Noise value={noise} />
+            <Quality value={quality} />
         </div>
     )
 }
@@ -37,7 +36,7 @@ const Display = ({rssi, noise, ssid}) => {
 const Ssid = ({name}) => <section className="ssid"><span className="value">{name}</span></section>
 const Signal = ({value}) => <section className="signal"><span className="label">Signal</span><span className="value">{value}</span></section>
 const Noise = ({value}) => <section className="noise"><span className="label">Noise</span><span className="value">{value}</span></section>
-const Snr = ({value}) => <section className="snr" style={{background: toColor(value, 25)}}><span className="label">Quality</span><span className="value">{value}</span></section>
+const Quality = ({value}) => <section className="quality" style={{background: toColor(value, 25)}}><span className="label">Quality</span><span className="value">{value}</span></section>
 
 
 const Application = React.createClass({
@@ -46,7 +45,8 @@ const Application = React.createClass({
       return {
           rssi: 0,
           noise: 0,
-          ssid: ''
+          quality: 0,
+          ssid: 'N/A'
       }
     },
 
@@ -55,7 +55,8 @@ const Application = React.createClass({
         ipc.on('data', (event, {rssi, noise, ssid}) => {
             //const data = message.map(({rssi}) => -rssi / 100)
             //console.log({rssi, noise, ssid});
-            this.setState({rssi, noise, ssid})
+            const quality = Math.abs(noise - rssi);
+            this.setState({ssid, rssi: 100+rssi, noise: 100+noise, quality})
         });
     },
 
@@ -65,7 +66,10 @@ const Application = React.createClass({
     },
 
     render() {
-        return <Display rssi={this.state.rssi} noise={this.state.noise} ssid={this.state.ssid}/>
+        return <Display ssid={this.state.ssid}
+                        rssi={this.state.rssi}
+                        noise={this.state.noise}
+                        quality={this.state.quality} />
     }
 })
 
