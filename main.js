@@ -64,7 +64,7 @@ const monitor = (win) => {
         .on('not-connected', () => {
           win.webContents.send('not-connected', 'not-connected');
         })
-        .on('data', ({rssi, noise, ssid}) => {
-          win.webContents.send('data', {rssi, noise, ssid});
+        .on('data', ({rssi, noise, ssid, channel}) => {
+          win.webContents.send('data', {rssi, noise, ssid, channel});
         })
 }

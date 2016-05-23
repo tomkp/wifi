@@ -19,7 +19,7 @@ const toColor = (value, threshold) => {
     return '#' + col
 };
 
-const Display = ({status, ssid, rssi, noise, quality}) => {
+const Display = ({status, ssid, rssi, noise, quality, channel}) => {
     if (status === 'not-connected') {
         return (
             <div className="status">
@@ -35,7 +35,7 @@ const Display = ({status, ssid, rssi, noise, quality}) => {
     }
     return (
         <div className="display">
-            <Ssid name={ssid}/>
+            <Ssid name={ssid} channel={channel} />
             <div className="values">
                 <Signal value={rssi}/>
                 <Noise value={noise}/>
@@ -47,10 +47,11 @@ const Display = ({status, ssid, rssi, noise, quality}) => {
 
 
 
-const Ssid = ({name}) => {
+const Ssid = ({name, channel}) => {
     return (
-        <section className="ssid">
+        <section className="ssid" title={channel}>
             <span className="value">{name}</span>
+            <span className="label">Channel {channel}</span>
         </section>
     )
 };
@@ -91,17 +92,18 @@ const Application = React.createClass({
             rssi: 0,
             noise: 0,
             quality: 0,
+            channel: '',
             ssid: 'N/A'
         }
     },
 
     componentDidMount() {
         console.log(`Application.componentDidMount`);
-        ipc.on('data', (event, {rssi, noise, ssid}) => {
+        ipc.on('data', (event, {rssi, noise, ssid, channel}) => {
             //const data = message.map(({rssi}) => -rssi / 100)
             //console.log({rssi, noise, ssid});
             const quality = Math.abs(noise - rssi);
-            this.setState({status: 'connected', ssid, rssi: 100 + rssi, noise: 100 + noise, quality})
+            this.setState({status: 'connected', ssid, rssi: 100 + rssi, noise: 100 + noise, quality, channel})
         });
         ipc.on('off', () => {
             console.log(`off`);
@@ -123,6 +125,7 @@ const Application = React.createClass({
                         ssid={this.state.ssid}
                         rssi={this.state.rssi}
                         noise={this.state.noise}
+                        channel={this.state.channel}
                         quality={this.state.quality}/>
     }
 });
