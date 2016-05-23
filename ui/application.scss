@@ -42,6 +42,18 @@ body {
   display: flex;
 }
 
+.status {
+
+  font-size: 20vmin;
+  font-family: 'Abel', sans-serif;
+
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
 .display {
   flex: 1;
   display: flex;

@@ -22,14 +22,14 @@ const toColor = (value, threshold) => {
 const Display = ({status, ssid, rssi, noise, quality}) => {
     if (status === 'not-connected') {
         return (
-            <div className="display">
+            <div className="status">
                 Not connected
             </div>
         )
     } else if (status === 'off') {
         return (
-            <div className="display">
-                Wifi turned off
+            <div className="status">
+                Wifi off
             </div>
         )
     }
