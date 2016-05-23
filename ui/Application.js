@@ -17,7 +17,7 @@ const toColor = (value, threshold) => {
     else if (value < threshold) col = fraction(value / 100, 'ffeeee', 'ff0000');
     //console.log(`${value} ${threshold} ${col}`)
     return '#' + col
-}
+};
 
 const Display = ({status, ssid, rssi, noise, quality}) => {
     if (status === 'not-connected') {
@@ -43,11 +43,17 @@ const Display = ({status, ssid, rssi, noise, quality}) => {
             </div>
         </div>
     )
-}
+};
 
 
 
-const Ssid = ({name}) => <section className="ssid"><span className="value">{name}</span></section>
+const Ssid = ({name}) => {
+    return (
+        <section className="ssid">
+            <span className="value">{name}</span>
+        </section>
+    )
+};
 
 const Signal = ({value}) => {
     return (
@@ -58,10 +64,23 @@ const Signal = ({value}) => {
     )
 };
 
-const Noise = ({value}) => <section className="noise"><span className="label">Noise</span><span
-    className="value">{value}</span></section>
-const Quality = ({value}) => <section className="quality" style={{background: toColor(value, 25)}}><span
-    className="label">Quality</span><span className="value">{value}</span></section>
+const Noise = ({value}) => {
+    return (
+        <section className="noise">
+            <span className="label">Noise</span>
+            <span className="value">{value}</span>
+        </section>
+    );
+};
+
+const Quality = ({value}) => {
+    return (
+        <section className="quality" style={{background: toColor(value, 25)}}>
+            <span className="label">Quality</span>
+            <span className="value">{value}</span>
+        </section>
+    )
+};
 
 
 const Application = React.createClass({
@@ -77,7 +96,7 @@ const Application = React.createClass({
     },
 
     componentDidMount() {
-        console.log(`Application.componentDidMount`)
+        console.log(`Application.componentDidMount`);
         ipc.on('data', (event, {rssi, noise, ssid}) => {
             //const data = message.map(({rssi}) => -rssi / 100)
             //console.log({rssi, noise, ssid});
@@ -87,7 +106,7 @@ const Application = React.createClass({
         ipc.on('off', () => {
             console.log(`off`);
             this.setState({status: 'off'})
-        })
+        });
         ipc.on('not-connected', () => {
             console.log(`not-connected`);
             this.setState({status: 'not-connected'})
@@ -95,7 +114,7 @@ const Application = React.createClass({
     },
 
     componentWillUnmount() {
-        console.log(`Application.componentWillUnmount`)
+        console.log(`Application.componentWillUnmount`);
         ipc.off('data');
     },
 
@@ -106,6 +125,6 @@ const Application = React.createClass({
                         noise={this.state.noise}
                         quality={this.state.quality}/>
     }
-})
+});
 
-render(<Application />, document.getElementById('root'))
+render(<Application />, document.getElementById('root'));
