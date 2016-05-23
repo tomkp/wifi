@@ -65,11 +65,11 @@ const monitor = (win) => {
 wifi
     .on('off', () => {
       console.log(`off`);
-      win.webContents.send('ping', 'off');
+      win.webContents.send('off', 'off');
     })
     .on('not-connected', () => {
       console.log(`not-connected`);
-      win.webContents.send('ping', 'not-connected');
+      win.webContents.send('not-connected', 'not-connected');
     })
     .on('data', ({rssi, noise, ssid}) => {
       //console.clear()
