@@ -7,3 +7,7 @@ How's my wifi?
     <img src="docs/wifi1.png" width=200 style="margin:1rem;" />
 </div>
 
+```
+    npm install
+    npm start
+```
