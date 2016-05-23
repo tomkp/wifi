@@ -48,31 +48,34 @@ body {
   flex-direction: column;
 }
 
-.display div {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  flex: 1;
+section {
+
   font-size: 20vmin;
   font-family: 'Abel', sans-serif;
+
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.label {
+  font-size: 10vmin;
+}
+
+.value {
 }
 
 .ssid {
-  flex: 1;
 }
 
 .signal {
-  flex: 1;
 }
 
 .noise {
-  flex: 1;
 }
 
 .snr {
-  flex: 1;
 }
 
-.metric {
-  flex: 1;
-}

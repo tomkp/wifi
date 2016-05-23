@@ -34,10 +34,10 @@ const Display = ({rssi, noise, ssid}) => {
     )
 }
 
-const Ssid = ({name}) => <div className="ssid">{name}</div>
-const Signal = ({value}) => <div className="signal">{value}</div>
-const Noise = ({value}) => <div className="noise">{value}</div>
-const Snr = ({value}) => <div className="snr" style={{background: toColor(value, 25)}}>{value}</div>
+const Ssid = ({name}) => <section className="ssid"><span className="value">{name}</span></section>
+const Signal = ({value}) => <section className="signal"><span className="label">Signal</span><span className="value">{value}</span></section>
+const Noise = ({value}) => <section className="noise"><span className="label">Noise</span><span className="value">{value}</span></section>
+const Snr = ({value}) => <section className="snr" style={{background: toColor(value, 25)}}><span className="label">Quality</span><span className="value">{value}</span></section>
 
 
 const Application = React.createClass({
