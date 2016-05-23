@@ -76,13 +76,25 @@ const Noise = ({value}) => {
 
 class Quality extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
+        this.state = {
+            values: Array(200).fill(0)
+        };
     }
+
+    componentWillReceiveProps(props) {
+        //console.log(`Quality.componentWillReceiveProps ${JSON.stringify(props)}`);
+        const newValues = [...this.state.values.slice(1), props.value];
+        this.setState({values: newValues})
+    }
+
     render() {
+        //console.log(`Quality.render`);
         return (
             <section className="quality" style={{background: toColor(this.props.value, 25)}}>
                 <span className="label">Quality</span>
                 <span className="value">{this.props.value}</span>
+                <Graph data={this.state.values} />
             </section>
         )
     }
