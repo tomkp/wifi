@@ -40,7 +40,9 @@ const Display = ({status, ssid, rssi, noise, quality, channel}) => {
                 <Signal value={rssi}/>
                 <Noise value={noise}/>
                 <Quality value={quality}/>
+                <QualityGraph value={quality}/>
             </div>
+
         </div>
     )
 };
@@ -74,7 +76,17 @@ const Noise = ({value}) => {
     );
 };
 
-class Quality extends React.Component {
+const Quality = ({value}) => {
+        return (
+            <section className="quality" style={{background: toColor(value, 25)}}>
+                <span className="label">Quality</span>
+                <span className="value">{value}</span>
+            </section>
+        )
+};
+
+
+class QualityGraph extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -91,9 +103,7 @@ class Quality extends React.Component {
     render() {
         //console.log(`Quality.render`);
         return (
-            <section className="quality" style={{background: toColor(this.props.value, 25)}}>
-                <span className="label">Quality</span>
-                <span className="value">{this.props.value}</span>
+            <section className="quality-graph" style={{background: toColor(this.props.value, 25)}}>
                 <Graph data={this.state.values} />
             </section>
         )
