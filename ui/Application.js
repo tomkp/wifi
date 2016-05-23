@@ -49,7 +49,7 @@ const Display = ({status, ssid, rssi, noise, quality, channel}) => {
 
 const Ssid = ({name, channel}) => {
     return (
-        <section className="ssid" title={channel}>
+        <section className="ssid">
             <span className="value">{name}</span>
             <span className="label">Channel {channel}</span>
         </section>
@@ -74,14 +74,19 @@ const Noise = ({value}) => {
     );
 };
 
-const Quality = ({value}) => {
-    return (
-        <section className="quality" style={{background: toColor(value, 25)}}>
-            <span className="label">Quality</span>
-            <span className="value">{value}</span>
-        </section>
-    )
-};
+class Quality extends React.Component {
+    constructor(props) {
+        super(props)
+    }
+    render() {
+        return (
+            <section className="quality" style={{background: toColor(this.props.value, 25)}}>
+                <span className="label">Quality</span>
+                <span className="value">{this.props.value}</span>
+            </section>
+        )
+    }
+}
 
 
 const Application = React.createClass({
