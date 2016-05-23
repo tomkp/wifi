@@ -18,7 +18,7 @@ const poll = () => {
             }
         })
         .on('end', function () {
-            console.log(`data: ${JSON.stringify(data)}`);
+            //console.log(`data: ${JSON.stringify(data)}`);
             if (data.AirPort === 'Off') {
                 events.emit('off')
                 return
