@@ -9,5 +9,6 @@ How's my wifi?
 
 ```
     npm install
+    npm compile
     npm start
 ```
