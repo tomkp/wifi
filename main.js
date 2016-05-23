@@ -25,6 +25,9 @@ function createWindow () {
     // when you should delete the corresponding element.
     mainWindow = null
   })
+
+
+  monitor(mainWindow);
 }
 
 // This method will be called when Electron has finished
@@ -46,8 +49,31 @@ app.on('activate', function () {
   // dock icon is clicked and there are no other windows open.
   if (mainWindow === null) {
     createWindow()
+
+
   }
 })
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+const wifi = require('./wifi')
+
+
+
+const monitor = (win) => {
+wifi
+    .on('off', () => {
+      console.log(`off`);
+      win.webContents.send('ping', 'off');
+    })
+    .on('not-connected', () => {
+      console.log(`not-connected`);
+      win.webContents.send('ping', 'not-connected');
+    })
+    .on('data', ({rssi, noise, ssid}) => {
+      //console.clear()
+      //console.log(`data ${rssi + 100}, ${noise + 100}, ${ssid}`);
+      win.webContents.send('data', {rssi, noise, ssid});
+    })
+}

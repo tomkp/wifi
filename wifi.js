@@ -4,7 +4,6 @@ const airport = '/System/Library/PrivateFrameworks/Apple80211.framework/Versions
 const EventEmitter = require('events').EventEmitter;
 const events = new EventEmitter();
 
-
 const poll = () => {
 
     let data = {}
@@ -30,7 +29,8 @@ const poll = () => {
             }
             const rssi = Number(data.agrCtlRSSI)
             const noise = Number(data.agrCtlNoise)
-            events.emit('data', {rssi, noise, ssid: data.SSID})
+            const channel = data.channel
+            events.emit('data', {rssi, noise, channel, ssid: data.SSID})
         })
 }
 
