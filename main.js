@@ -54,22 +54,17 @@ app.on('activate', function () {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
 
 const wifi = require('./wifi')
-
-
-
 const monitor = (win) => {
-wifi
-    .on('off', () => {
-      win.webContents.send('off', 'off');
-    })
-    .on('not-connected', () => {
-      win.webContents.send('not-connected', 'not-connected');
-    })
-    .on('data', ({rssi, noise, ssid}) => {
-      win.webContents.send('data', {rssi, noise, ssid});
-    })
+    wifi
+        .on('off', () => {
+          win.webContents.send('off', 'off');
+        })
+        .on('not-connected', () => {
+          win.webContents.send('not-connected', 'not-connected');
+        })
+        .on('data', ({rssi, noise, ssid}) => {
+          win.webContents.send('data', {rssi, noise, ssid});
+        })
 }
