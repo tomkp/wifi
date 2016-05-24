@@ -37,7 +37,7 @@ const poll = () => {
 
 setInterval(() => {
     poll();
-}, 1000);
+}, 100);
 
 
 module.exports = events;
