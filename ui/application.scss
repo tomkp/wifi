@@ -81,6 +81,8 @@ section {
 .quality-graph {
   height: 10vmin;
   justify-content: flex-end;
+  display: flex;
+  flex-direction: column;
 }
 
 .label {
@@ -111,7 +113,6 @@ section {
   .label {
     font-size: 5vh;
   }
-
 
   .values {
     flex: 1;
