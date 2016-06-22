@@ -13,10 +13,8 @@
     "url": "git+https://github.com/tomkp/wifi.git"
   },
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial"
+    "electron",
+    "wifi"
   ],
   "author": "GitHub",
   "license": "CC0-1.0",
