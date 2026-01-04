@@ -7,15 +7,19 @@ export const bound = (value) => {
     return value;
 };
 
+const toArray = (rgb) => [rgb.red, rgb.green, rgb.blue];
+
 export const convert = (from, to, index, value) => {
     return Math.abs(parseInt(from[index] + (to[index] - from[index]) * bound(value)));
 };
 
 // (0.4, "ff00ff", "00ffff")
 export default (value, from, to) => {
+    const fromRgb = toArray(hexToRgb(from));
+    const toRgb = toArray(hexToRgb(to));
     return rgbToHex(
-        convert(hexToRgb(from), hexToRgb(to), 0, value),
-        convert(hexToRgb(from), hexToRgb(to), 1, value),
-        convert(hexToRgb(from), hexToRgb(to), 2, value)
+        convert(fromRgb, toRgb, 0, value),
+        convert(fromRgb, toRgb, 1, value),
+        convert(fromRgb, toRgb, 2, value)
     );
 };
