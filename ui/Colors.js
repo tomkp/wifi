@@ -8,13 +8,7 @@ export const bound = (value) => {
 };
 
 export const convert = (from, to, index, value) => {
-    return Math.abs(
-        parseInt(
-            (from[index] + (
-                (to[index] - from[index]) * bound(value))
-            )
-        )
-    );
+    return Math.abs(parseInt(from[index] + (to[index] - from[index]) * bound(value)));
 };
 
 // (0.4, "ff00ff", "00ffff")
@@ -25,4 +19,3 @@ export default (value, from, to) => {
         convert(hexToRgb(from), hexToRgb(to), 2, value)
     );
 };
-

@@ -9,9 +9,5 @@ module.exports = {
         '\\.(css|scss)$': '<rootDir>/__mocks__/styleMock.js'
     },
     coverageDirectory: 'coverage',
-    collectCoverageFrom: [
-        'ui/**/*.js',
-        'wifi.js',
-        '!**/*.test.js'
-    ]
+    collectCoverageFrom: ['ui/**/*.js', 'wifi.js', '!**/*.test.js']
 };
