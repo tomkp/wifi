@@ -1,9 +1,12 @@
-import React from 'react';
+import { useRef, useEffect } from 'react';
 
-export default React.createClass({
-    componentWillReceiveProps(_props) {
-        const data = this.props.data;
-        const canvas = this.refs['canvas'];
+const Graph = ({ data }) => {
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
         const count = data.length;
@@ -18,9 +21,9 @@ export default React.createClass({
             const h = (y * -data[i]) / 100;
             context.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
         }
-    },
+    }, [data]);
 
-    render() {
-        return <canvas className="graph" ref="canvas" width={this.props.data.length} />;
-    }
-});
+    return <canvas className="graph" ref={canvasRef} width={data.length} />;
+};
+
+export default Graph;

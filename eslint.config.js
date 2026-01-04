@@ -33,8 +33,6 @@ module.exports = [
             ...react.configs['jsx-runtime'].rules,
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
-            'react/no-deprecated': 'off',
-            'react/no-string-refs': 'off',
             'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^[A-Z]' }],
             'no-console': 'off'
         }
