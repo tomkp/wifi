@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import './application.scss';
+import 'normalize.css';
+import './application.css';
 import fraction from './Colors';
 import Graph from './Graph';
-import './graph.scss';
+import './graph.css';
 
 type WifiStatus = 'connected' | 'off' | 'not-connected' | '';
 
