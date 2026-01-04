@@ -1,13 +1,13 @@
 import hexToRgb from 'hex-rgb';
 import rgbToHex from 'rgb-hex';
 
-const bound = (value) => {
+export const bound = (value) => {
     if (value > 1) return 1;
     if (value < 0) return 0;
     return value;
 };
 
-const convert = (from, to, index, value) => {
+export const convert = (from, to, index, value) => {
     return Math.abs(
         parseInt(
             (from[index] + (
