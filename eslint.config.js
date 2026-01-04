@@ -56,6 +56,6 @@ module.exports = [
         }
     },
     {
-        ignores: ['node_modules/', 'dist/', 'coverage/']
+        ignores: ['node_modules/', 'dist/', 'dist-electron/', 'coverage/']
     }
 ];

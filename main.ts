@@ -1,4 +1,5 @@
 import { app, BrowserWindow } from 'electron';
+import path from 'path';
 import wifi from './wifi';
 
 interface WifiData {
@@ -10,9 +11,24 @@ interface WifiData {
 
 let mainWindow: BrowserWindow | null = null;
 
+const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+
 function createWindow(): void {
-    mainWindow = new BrowserWindow({ width: 200, height: 600 });
-    mainWindow.loadURL(`file://${__dirname}/index.html`);
+    mainWindow = new BrowserWindow({
+        width: 200,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false
+        }
+    });
+
+    if (VITE_DEV_SERVER_URL) {
+        mainWindow.loadURL(VITE_DEV_SERVER_URL);
+    } else {
+        mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+    }
+
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
