@@ -1,11 +1,45 @@
-const spawn = require('child_process').spawn;
-const split = require('split');
+import { spawn } from 'child_process';
+import split from 'split';
+import { EventEmitter } from 'events';
+
 const airport =
     '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport';
-const EventEmitter = require('events').EventEmitter;
+
+interface ParsedLine {
+    key: string;
+    value: string;
+}
+
+interface RawWifiData {
+    AirPort?: string;
+    SSID?: string;
+    agrCtlRSSI?: string;
+    agrCtlNoise?: string;
+    channel?: string;
+    [key: string]: string | undefined;
+}
+
+interface WifiOffResult {
+    status: 'off';
+}
+
+interface WifiNotConnectedResult {
+    status: 'not-connected';
+}
+
+interface WifiConnectedResult {
+    status: 'connected';
+    rssi: number;
+    noise: number;
+    channel: string;
+    ssid: string;
+}
+
+type WifiResult = WifiOffResult | WifiNotConnectedResult | WifiConnectedResult;
+
 const events = new EventEmitter();
 
-const parseLine = (line) => {
+export const parseLine = (line: string): ParsedLine | null => {
     const info = line.trim().split(': ');
     if (info.length === 2) {
         return { key: info[0], value: info[1] };
@@ -13,7 +47,7 @@ const parseLine = (line) => {
     return null;
 };
 
-const parseWifiData = (data) => {
+export const parseWifiData = (data: RawWifiData): WifiResult => {
     if (data.AirPort === 'Off') {
         return { status: 'off' };
     }
@@ -22,7 +56,7 @@ const parseWifiData = (data) => {
     }
     const rssi = Number(data.agrCtlRSSI);
     const noise = Number(data.agrCtlNoise);
-    const channel = data.channel;
+    const channel = data.channel ?? '';
     return {
         status: 'connected',
         rssi,
@@ -32,18 +66,18 @@ const parseWifiData = (data) => {
     };
 };
 
-const poll = () => {
-    let data = {};
+const poll = (): void => {
+    const data: RawWifiData = {};
 
     spawn(airport, ['-I'])
         .stdout.pipe(split())
-        .on('data', function (line) {
+        .on('data', (line: string) => {
             const parsed = parseLine(line);
             if (parsed) {
                 data[parsed.key] = parsed.value;
             }
         })
-        .on('end', function () {
+        .on('end', () => {
             const result = parseWifiData(data);
             if (result.status === 'off') {
                 events.emit('off');
@@ -60,9 +94,9 @@ const poll = () => {
         });
 };
 
-let intervalId = null;
+let intervalId: ReturnType<typeof setInterval> | null = null;
 
-const start = (interval = 20) => {
+export const start = (interval = 20): EventEmitter => {
     if (!intervalId) {
         intervalId = setInterval(() => {
             poll();
@@ -71,7 +105,7 @@ const start = (interval = 20) => {
     return events;
 };
 
-const stop = () => {
+export const stop = (): void => {
     if (intervalId) {
         clearInterval(intervalId);
         intervalId = null;
@@ -83,8 +117,4 @@ if (require.main === module || process.env.NODE_ENV !== 'test') {
     start();
 }
 
-module.exports = events;
-module.exports.parseLine = parseLine;
-module.exports.parseWifiData = parseWifiData;
-module.exports.start = start;
-module.exports.stop = stop;
+export default events;

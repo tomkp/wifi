@@ -1,15 +1,19 @@
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const wifi = require('./wifi');
-let mainWindow;
+import { app, BrowserWindow } from 'electron';
+import wifi from './wifi';
 
-function createWindow() {
+interface WifiData {
+    rssi: number;
+    noise: number;
+    ssid: string;
+    channel: string;
+}
+
+let mainWindow: BrowserWindow | null = null;
+
+function createWindow(): void {
     mainWindow = new BrowserWindow({ width: 200, height: 600 });
     mainWindow.loadURL(`file://${__dirname}/index.html`);
-    //mainWindow.webContents.openDevTools()
-    mainWindow.on('closed', function () {
-        //wifi.off('off').off('not-connected').off('data');
+    mainWindow.on('closed', () => {
         mainWindow = null;
     });
     monitor(mainWindow);
@@ -17,26 +21,26 @@ function createWindow() {
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
-app.on('activate', function () {
+app.on('activate', () => {
     if (mainWindow === null) {
         createWindow();
     }
 });
 
-const monitor = (win) => {
+const monitor = (win: BrowserWindow): void => {
     wifi.on('off', () => {
         if (mainWindow) win.webContents.send('off', 'off');
     })
         .on('not-connected', () => {
             if (mainWindow) win.webContents.send('not-connected', 'not-connected');
         })
-        .on('data', ({ rssi, noise, ssid, channel }) => {
+        .on('data', ({ rssi, noise, ssid, channel }: WifiData) => {
             if (mainWindow) win.webContents.send('data', { rssi, noise, ssid, channel });
         });
 };

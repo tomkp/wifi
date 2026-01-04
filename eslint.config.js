@@ -1,11 +1,13 @@
 const js = require('@eslint/js');
 const react = require('eslint-plugin-react');
 const globals = require('globals');
+const tseslint = require('typescript-eslint');
 
 module.exports = [
     js.configs.recommended,
+    ...tseslint.configs.recommended,
     {
-        files: ['**/*.js', '**/*.jsx'],
+        files: ['**/*.ts', '**/*.tsx'],
         plugins: {
             react
         },
@@ -33,8 +35,24 @@ module.exports = [
             ...react.configs['jsx-runtime'].rules,
             'react/react-in-jsx-scope': 'off',
             'react/prop-types': 'off',
-            'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^[A-Z]' }],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                { argsIgnorePattern: '^_', varsIgnorePattern: '^[A-Z]' }
+            ],
             'no-console': 'off'
+        }
+    },
+    {
+        files: ['**/*.js'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'commonjs',
+            globals: {
+                ...globals.node
+            }
+        },
+        rules: {
+            '@typescript-eslint/no-require-imports': 'off'
         }
     },
     {

@@ -1,6 +1,8 @@
 import { bound, convert } from './Colors';
 import fraction from './Colors';
 
+type RGB = [number, number, number];
+
 describe('Colors utility', () => {
     describe('bound', () => {
         it('returns 0 for negative values', () => {
@@ -22,8 +24,8 @@ describe('Colors utility', () => {
 
     describe('convert', () => {
         it('converts color channel based on interpolation value', () => {
-            const from = [255, 0, 0];
-            const to = [0, 255, 0];
+            const from: RGB = [255, 0, 0];
+            const to: RGB = [0, 255, 0];
 
             expect(convert(from, to, 0, 0)).toBe(255);
             expect(convert(from, to, 0, 1)).toBe(0);
@@ -31,8 +33,8 @@ describe('Colors utility', () => {
         });
 
         it('handles second channel', () => {
-            const from = [255, 0, 0];
-            const to = [0, 255, 0];
+            const from: RGB = [255, 0, 0];
+            const to: RGB = [0, 255, 0];
 
             expect(convert(from, to, 1, 0)).toBe(0);
             expect(convert(from, to, 1, 1)).toBe(255);

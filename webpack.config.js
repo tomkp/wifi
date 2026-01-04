@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-    entry: './ui/Application.js',
+    entry: './ui/Application.tsx',
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js'
@@ -11,12 +11,12 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.jsx?$/,
+                test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'babel-loader',
+                    loader: 'ts-loader',
                     options: {
-                        presets: ['@babel/preset-env', '@babel/preset-react']
+                        configFile: 'tsconfig.build.json'
                     }
                 }
             },
@@ -31,6 +31,6 @@ module.exports = {
         ]
     },
     resolve: {
-        extensions: ['.js', '.jsx']
+        extensions: ['.ts', '.tsx', '.js', '.jsx']
     }
 };

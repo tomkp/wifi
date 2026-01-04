@@ -1,13 +1,19 @@
 import { useRef, useEffect } from 'react';
 
-const Graph = ({ data }) => {
-    const canvasRef = useRef(null);
+interface GraphProps {
+    data: number[];
+}
+
+const Graph = ({ data }: GraphProps) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const context = canvas.getContext('2d');
+        if (!context) return;
+
         context.clearRect(0, 0, canvas.width, canvas.height);
         const count = data.length;
         const y = canvas.height;
