@@ -1,4 +1,5 @@
 dist
-dist-electron
+.vite
+out
 coverage
 node_modules

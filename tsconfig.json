@@ -16,8 +16,8 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "typeRoots": ["./node_modules/@types", "./types"]
+        "typeRoots": ["./node_modules/@types", "./src/types"]
     },
-    "include": ["ui/**/*", "*.ts", "types/**/*"],
-    "exclude": ["node_modules", "dist", "dist-electron"]
+    "include": ["src/**/*", "*.ts"],
+    "exclude": ["node_modules", "dist", ".vite", "out"]
 }
