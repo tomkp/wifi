@@ -1,4 +1,4 @@
-node_modules
 dist
+dist-electron
 coverage
-package-lock.json
+node_modules
