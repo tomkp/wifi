@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ipcRenderer, IpcRendererEvent } from 'electron';
 import './application.scss';
 import fraction from './Colors';
 import Graph from './Graph';
@@ -22,6 +21,19 @@ interface AppState {
     quality: number;
     channel: string;
     ssid: string;
+}
+
+interface ElectronAPI {
+    onData: (callback: (data: WifiData) => void) => void;
+    onOff: (callback: () => void) => void;
+    onNotConnected: (callback: () => void) => void;
+    removeAllListeners: () => void;
+}
+
+declare global {
+    interface Window {
+        electronAPI: ElectronAPI;
+    }
 }
 
 const toColor = (value: number, threshold: number): string => {
@@ -137,7 +149,7 @@ const Application = () => {
     useEffect(() => {
         console.log('Application mounted');
 
-        const handleData = (_event: IpcRendererEvent, { rssi, noise, ssid, channel }: WifiData) => {
+        window.electronAPI.onData(({ rssi, noise, ssid, channel }) => {
             const quality = Math.abs(noise - rssi);
             setState({
                 status: 'connected',
@@ -147,27 +159,21 @@ const Application = () => {
                 quality,
                 channel
             });
-        };
+        });
 
-        const handleOff = () => {
+        window.electronAPI.onOff(() => {
             console.log('off');
             setState((prev) => ({ ...prev, status: 'off' }));
-        };
+        });
 
-        const handleNotConnected = () => {
+        window.electronAPI.onNotConnected(() => {
             console.log('not-connected');
             setState((prev) => ({ ...prev, status: 'not-connected' }));
-        };
-
-        ipcRenderer.on('data', handleData);
-        ipcRenderer.on('off', handleOff);
-        ipcRenderer.on('not-connected', handleNotConnected);
+        });
 
         return () => {
             console.log('Application unmounting');
-            ipcRenderer.off('data', handleData);
-            ipcRenderer.off('off', handleOff);
-            ipcRenderer.off('not-connected', handleNotConnected);
+            window.electronAPI.removeAllListeners();
         };
     }, []);
 

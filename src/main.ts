@@ -2,6 +2,9 @@ import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import wifi from './wifi';
 
+declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
+declare const MAIN_WINDOW_VITE_NAME: string;
+
 interface WifiData {
     rssi: number;
     noise: number;
@@ -11,22 +14,21 @@ interface WifiData {
 
 let mainWindow: BrowserWindow | null = null;
 
-const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
-
 function createWindow(): void {
     mainWindow = new BrowserWindow({
         width: 200,
         height: 600,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false
+            preload: path.join(__dirname, 'preload.js')
         }
     });
 
-    if (VITE_DEV_SERVER_URL) {
-        mainWindow.loadURL(VITE_DEV_SERVER_URL);
+    if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+        mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     } else {
-        mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
+        mainWindow.loadFile(
+            path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+        );
     }
 
     mainWindow.on('closed', () => {

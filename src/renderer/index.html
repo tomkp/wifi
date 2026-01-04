@@ -2,6 +2,10 @@
 <html>
     <head>
         <meta charset="UTF-8" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com"
+        />
         <title>WIFI</title>
         <link
             href="https://fonts.googleapis.com/css?family=Abel"
@@ -11,6 +15,6 @@
     </head>
     <body>
         <div id="root"></div>
-        <script type="module" src="/ui/Application.tsx"></script>
+        <script type="module" src="./Application.tsx"></script>
     </body>
 </html>
