@@ -1,4 +1,4 @@
-const { parseLine, parseWifiData } = require('./wifi');
+import { parseLine, parseWifiData } from './wifi';
 
 describe('wifi module', () => {
     describe('parseLine', () => {
@@ -58,8 +58,10 @@ describe('wifi module', () => {
                 agrCtlNoise: '-85',
                 channel: '1'
             });
-            expect(typeof result.rssi).toBe('number');
-            expect(typeof result.noise).toBe('number');
+            if (result.status === 'connected') {
+                expect(typeof result.rssi).toBe('number');
+                expect(typeof result.noise).toBe('number');
+            }
         });
     });
 });

@@ -1,21 +1,42 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
-import electron from 'electron';
+import { ipcRenderer, IpcRendererEvent } from 'electron';
 import './application.scss';
 import fraction from './Colors';
 import Graph from './Graph';
 import './graph.scss';
 
-const ipc = electron.ipcRenderer;
+type WifiStatus = 'connected' | 'off' | 'not-connected' | '';
 
-const toColor = (value, threshold) => {
+interface WifiData {
+    rssi: number;
+    noise: number;
+    ssid: string;
+    channel: string;
+}
+
+interface AppState {
+    status: WifiStatus;
+    rssi: number;
+    noise: number;
+    quality: number;
+    channel: string;
+    ssid: string;
+}
+
+const toColor = (value: number, threshold: number): string => {
     let col = '#eee';
     if (value > threshold) col = fraction(value / 100, 'eeffee', '00ff00');
     else if (value < threshold) col = fraction(value / 100, 'ffeeee', 'ff0000');
     return '#' + col;
 };
 
-const Ssid = ({ name, channel }) => {
+interface SsidProps {
+    name: string;
+    channel: string;
+}
+
+const Ssid = ({ name, channel }: SsidProps) => {
     return (
         <section className="ssid">
             <span className="value">{name}</span>
@@ -24,7 +45,11 @@ const Ssid = ({ name, channel }) => {
     );
 };
 
-const Signal = ({ value }) => {
+interface ValueProps {
+    value: number;
+}
+
+const Signal = ({ value }: ValueProps) => {
     return (
         <section className="signal">
             <span className="label">Signal</span>
@@ -33,7 +58,7 @@ const Signal = ({ value }) => {
     );
 };
 
-const Noise = ({ value }) => {
+const Noise = ({ value }: ValueProps) => {
     return (
         <section className="noise">
             <span className="label">Noise</span>
@@ -42,7 +67,7 @@ const Noise = ({ value }) => {
     );
 };
 
-const Quality = ({ value }) => {
+const Quality = ({ value }: ValueProps) => {
     return (
         <section className="quality" style={{ background: toColor(value, 25) }}>
             <span className="label">Quality</span>
@@ -51,8 +76,8 @@ const Quality = ({ value }) => {
     );
 };
 
-const QualityGraph = ({ value }) => {
-    const [values, setValues] = useState(() => Array(200).fill(0));
+const QualityGraph = ({ value }: ValueProps) => {
+    const [values, setValues] = useState<number[]>(() => Array(200).fill(0));
     const prevValueRef = useRef(value);
 
     useEffect(() => {
@@ -69,7 +94,16 @@ const QualityGraph = ({ value }) => {
     );
 };
 
-const Display = ({ status, ssid, rssi, noise, quality, channel }) => {
+interface DisplayProps {
+    status: WifiStatus;
+    ssid: string;
+    rssi: number;
+    noise: number;
+    quality: number;
+    channel: string;
+}
+
+const Display = ({ status, ssid, rssi, noise, quality, channel }: DisplayProps) => {
     if (status === 'not-connected') {
         return <div className="status">Not connected</div>;
     } else if (status === 'off') {
@@ -91,7 +125,7 @@ const Display = ({ status, ssid, rssi, noise, quality, channel }) => {
 };
 
 const Application = () => {
-    const [state, setState] = useState({
+    const [state, setState] = useState<AppState>({
         status: '',
         rssi: 0,
         noise: 0,
@@ -103,7 +137,7 @@ const Application = () => {
     useEffect(() => {
         console.log('Application mounted');
 
-        const handleData = (_event, { rssi, noise, ssid, channel }) => {
+        const handleData = (_event: IpcRendererEvent, { rssi, noise, ssid, channel }: WifiData) => {
             const quality = Math.abs(noise - rssi);
             setState({
                 status: 'connected',
@@ -125,15 +159,15 @@ const Application = () => {
             setState((prev) => ({ ...prev, status: 'not-connected' }));
         };
 
-        ipc.on('data', handleData);
-        ipc.on('off', handleOff);
-        ipc.on('not-connected', handleNotConnected);
+        ipcRenderer.on('data', handleData);
+        ipcRenderer.on('off', handleOff);
+        ipcRenderer.on('not-connected', handleNotConnected);
 
         return () => {
             console.log('Application unmounting');
-            ipc.off('data', handleData);
-            ipc.off('off', handleOff);
-            ipc.off('not-connected', handleNotConnected);
+            ipcRenderer.off('data', handleData);
+            ipcRenderer.off('off', handleOff);
+            ipcRenderer.off('not-connected', handleNotConnected);
         };
     }, []);
 
@@ -150,5 +184,7 @@ const Application = () => {
 };
 
 const container = document.getElementById('root');
-const root = createRoot(container);
-root.render(<Application />);
+if (container) {
+    const root = createRoot(container);
+    root.render(<Application />);
+}

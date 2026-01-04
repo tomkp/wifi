@@ -1,13 +1,14 @@
 module.exports = {
     testEnvironment: 'node',
+    preset: 'ts-jest',
     transform: {
-        '^.+\\.(js|jsx)$': 'babel-jest'
+        '^.+\\.(ts|tsx)$': 'ts-jest'
     },
-    moduleFileExtensions: ['js', 'jsx'],
-    testMatch: ['**/*.test.js'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+    testMatch: ['**/*.test.ts', '**/*.test.tsx'],
     moduleNameMapper: {
         '\\.(css|scss)$': '<rootDir>/__mocks__/styleMock.js'
     },
     coverageDirectory: 'coverage',
-    collectCoverageFrom: ['ui/**/*.js', 'wifi.js', '!**/*.test.js']
+    collectCoverageFrom: ['ui/**/*.ts', 'ui/**/*.tsx', 'wifi.ts', '!**/*.test.ts', '!**/*.test.tsx']
 };
