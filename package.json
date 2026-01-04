@@ -35,8 +35,7 @@
         "normalize.css": "^8.0.1",
         "react": "^18.3.0",
         "react-dom": "^18.3.0",
-        "rgb-hex": "^2.1.0",
-        "split": "^1.0.1"
+        "rgb-hex": "^2.1.0"
     },
     "devDependencies": {
         "@electron-forge/cli": "^7.10.2",

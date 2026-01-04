@@ -1,22 +1,20 @@
-import { spawn } from 'child_process';
-import split from 'split';
+import { exec } from 'child_process';
 import { EventEmitter } from 'events';
 
-const airport =
-    '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport';
-
-interface ParsedLine {
-    key: string;
-    value: string;
+interface AirPortInterface {
+    _name: string;
+    spairport_status_information?: string;
+    spairport_current_network_information?: {
+        _name: string;
+        spairport_signal_noise: string;
+        spairport_network_channel: string;
+    };
 }
 
-interface RawWifiData {
-    AirPort?: string;
-    SSID?: string;
-    agrCtlRSSI?: string;
-    agrCtlNoise?: string;
-    channel?: string;
-    [key: string]: string | undefined;
+interface SystemProfilerData {
+    SPAirPortDataType?: Array<{
+        spairport_airport_interfaces?: AirPortInterface[];
+    }>;
 }
 
 interface WifiOffResult {
@@ -35,50 +33,70 @@ interface WifiConnectedResult {
     ssid: string;
 }
 
-type WifiResult = WifiOffResult | WifiNotConnectedResult | WifiConnectedResult;
+export type WifiResult = WifiOffResult | WifiNotConnectedResult | WifiConnectedResult;
 
 const events = new EventEmitter();
 
-export const parseLine = (line: string): ParsedLine | null => {
-    const info = line.trim().split(': ');
-    if (info.length === 2) {
-        return { key: info[0], value: info[1] };
+export const parseSignalNoise = (signalNoise: string): { rssi: number; noise: number } => {
+    const match = signalNoise.match(/(-?\d+)\s*dBm\s*\/\s*(-?\d+)\s*dBm/);
+    if (match) {
+        return {
+            rssi: parseInt(match[1], 10),
+            noise: parseInt(match[2], 10)
+        };
     }
-    return null;
+    return { rssi: 0, noise: 0 };
 };
 
-export const parseWifiData = (data: RawWifiData): WifiResult => {
-    if (data.AirPort === 'Off') {
+export const parseChannel = (channel: string): string => {
+    const match = channel.match(/^(\d+)/);
+    return match ? match[1] : '';
+};
+
+export const parseSystemProfilerData = (data: SystemProfilerData): WifiResult => {
+    const airports = data.SPAirPortDataType?.[0]?.spairport_airport_interfaces;
+    if (!airports || airports.length === 0) {
         return { status: 'off' };
     }
-    if (!data.SSID) {
+
+    const wifiInterface = airports.find((iface) => iface._name === 'en0');
+    if (!wifiInterface) {
+        return { status: 'off' };
+    }
+
+    const status = wifiInterface.spairport_status_information;
+    if (status === 'spairport_status_off') {
+        return { status: 'off' };
+    }
+
+    const currentNetwork = wifiInterface.spairport_current_network_information;
+    if (!currentNetwork) {
         return { status: 'not-connected' };
     }
-    const rssi = Number(data.agrCtlRSSI);
-    const noise = Number(data.agrCtlNoise);
-    const channel = data.channel ?? '';
+
+    const { rssi, noise } = parseSignalNoise(currentNetwork.spairport_signal_noise);
+    const channel = parseChannel(currentNetwork.spairport_network_channel);
+
     return {
         status: 'connected',
+        ssid: currentNetwork._name,
         rssi,
         noise,
-        channel,
-        ssid: data.SSID
+        channel
     };
 };
 
 const poll = (): void => {
-    const data: RawWifiData = {};
+    exec('system_profiler SPAirPortDataType -json', (error, stdout) => {
+        if (error) {
+            events.emit('error', error);
+            return;
+        }
 
-    spawn(airport, ['-I'])
-        .stdout.pipe(split())
-        .on('data', (line: string) => {
-            const parsed = parseLine(line);
-            if (parsed) {
-                data[parsed.key] = parsed.value;
-            }
-        })
-        .on('end', () => {
-            const result = parseWifiData(data);
+        try {
+            const data: SystemProfilerData = JSON.parse(stdout);
+            const result = parseSystemProfilerData(data);
+
             if (result.status === 'off') {
                 events.emit('off');
             } else if (result.status === 'not-connected') {
@@ -91,13 +109,17 @@ const poll = (): void => {
                     ssid: result.ssid
                 });
             }
-        });
+        } catch {
+            events.emit('error', new Error('Failed to parse system_profiler output'));
+        }
+    });
 };
 
 let intervalId: ReturnType<typeof setInterval> | null = null;
 
-export const start = (interval = 20): EventEmitter => {
+export const start = (interval = 2000): EventEmitter => {
     if (!intervalId) {
+        poll();
         intervalId = setInterval(() => {
             poll();
         }, interval);
@@ -111,10 +133,5 @@ export const stop = (): void => {
         intervalId = null;
     }
 };
-
-// Auto-start for backward compatibility when run directly
-if (require.main === module || process.env.NODE_ENV !== 'test') {
-    start();
-}
 
 export default events;
