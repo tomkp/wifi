@@ -1,5 +1,5 @@
-import React from 'react';
-import { render } from 'react-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import electron from 'electron';
 import './application.scss';
 import fraction from './Colors';
@@ -51,30 +51,23 @@ const Quality = ({ value }) => {
     );
 };
 
-class QualityGraph extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            values: Array(200).fill(0)
-        };
-    }
+const QualityGraph = ({ value }) => {
+    const [values, setValues] = useState(() => Array(200).fill(0));
+    const prevValueRef = useRef(value);
 
-    componentWillReceiveProps(props) {
-        const newValues = [...this.state.values.slice(1), props.value];
-        this.setState({ values: newValues });
-    }
+    useEffect(() => {
+        if (prevValueRef.current !== value) {
+            setValues((prev) => [...prev.slice(1), value]);
+            prevValueRef.current = value;
+        }
+    }, [value]);
 
-    render() {
-        return (
-            <section
-                className="quality-graph"
-                style={{ background: toColor(this.props.value, 25) }}
-            >
-                <Graph data={this.state.values} />
-            </section>
-        );
-    }
-}
+    return (
+        <section className="quality-graph" style={{ background: toColor(value, 25) }}>
+            <Graph data={values} />
+        </section>
+    );
+};
 
 const Display = ({ status, ssid, rssi, noise, quality, channel }) => {
     if (status === 'not-connected') {
@@ -97,23 +90,22 @@ const Display = ({ status, ssid, rssi, noise, quality, channel }) => {
     );
 };
 
-const Application = React.createClass({
-    getInitialState() {
-        return {
-            status: '',
-            rssi: 0,
-            noise: 0,
-            quality: 0,
-            channel: '',
-            ssid: 'N/A'
-        };
-    },
+const Application = () => {
+    const [state, setState] = useState({
+        status: '',
+        rssi: 0,
+        noise: 0,
+        quality: 0,
+        channel: '',
+        ssid: 'N/A'
+    });
 
-    componentDidMount() {
-        console.log('Application.componentDidMount');
-        ipc.on('data', (_event, { rssi, noise, ssid, channel }) => {
+    useEffect(() => {
+        console.log('Application mounted');
+
+        const handleData = (_event, { rssi, noise, ssid, channel }) => {
             const quality = Math.abs(noise - rssi);
-            this.setState({
+            setState({
                 status: 'connected',
                 ssid,
                 rssi: 100 + rssi,
@@ -121,34 +113,42 @@ const Application = React.createClass({
                 quality,
                 channel
             });
-        });
-        ipc.on('off', () => {
+        };
+
+        const handleOff = () => {
             console.log('off');
-            this.setState({ status: 'off' });
-        });
-        ipc.on('not-connected', () => {
+            setState((prev) => ({ ...prev, status: 'off' }));
+        };
+
+        const handleNotConnected = () => {
             console.log('not-connected');
-            this.setState({ status: 'not-connected' });
-        });
-    },
+            setState((prev) => ({ ...prev, status: 'not-connected' }));
+        };
 
-    componentWillUnmount() {
-        console.log('Application.componentWillUnmount');
-        ipc.off('data');
-    },
+        ipc.on('data', handleData);
+        ipc.on('off', handleOff);
+        ipc.on('not-connected', handleNotConnected);
 
-    render() {
-        return (
-            <Display
-                status={this.state.status}
-                ssid={this.state.ssid}
-                rssi={this.state.rssi}
-                noise={this.state.noise}
-                channel={this.state.channel}
-                quality={this.state.quality}
-            />
-        );
-    }
-});
+        return () => {
+            console.log('Application unmounting');
+            ipc.off('data', handleData);
+            ipc.off('off', handleOff);
+            ipc.off('not-connected', handleNotConnected);
+        };
+    }, []);
 
-render(<Application />, document.getElementById('root'));
+    return (
+        <Display
+            status={state.status}
+            ssid={state.ssid}
+            rssi={state.rssi}
+            noise={state.noise}
+            channel={state.channel}
+            quality={state.quality}
+        />
+    );
+};
+
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<Application />);
