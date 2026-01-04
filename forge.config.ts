@@ -7,15 +7,7 @@ import { VitePlugin } from '@electron-forge/plugin-vite';
 
 const config: ForgeConfig = {
     packagerConfig: {
-        asar: true,
-        extraResource: ['resources/wifi-info'],
-        osxSign: {},
-        extendInfo: {
-            NSLocationWhenInUseUsageDescription:
-                'This app needs location access to display the WiFi network name.',
-            NSLocationUsageDescription:
-                'This app needs location access to display the WiFi network name.'
-        }
+        asar: true
     },
     rebuildConfig: {},
     makers: [

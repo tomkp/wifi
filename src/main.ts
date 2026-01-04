@@ -44,9 +44,7 @@ app.on('ready', () => {
 
 app.on('window-all-closed', () => {
     stopWifi();
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    app.quit();
 });
 
 app.on('activate', () => {

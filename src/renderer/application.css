@@ -90,6 +90,11 @@ section {
     font-size: 10vmin;
 }
 
+.max {
+    font-size: 0.4em;
+    opacity: 0.4;
+}
+
 @media screen and (orientation: landscape) {
     .values {
         flex-direction: row;

@@ -4,13 +4,8 @@
     "description": "wifi application",
     "main": ".vite/build/main.js",
     "scripts": {
-        "build:helper": "swiftc -o resources/wifi-info src/helpers/wifi-info.swift -framework CoreWLAN -framework CoreLocation",
-        "prestart": "npm run build:helper",
         "start": "electron-forge start",
-        "prepackage": "npm run build:helper",
         "package": "electron-forge package",
-        "package:run": "npm run package && open out/wifi-darwin-arm64/wifi.app",
-        "premake": "npm run build:helper",
         "make": "electron-forge make",
         "test": "vitest run",
         "test:watch": "vitest",

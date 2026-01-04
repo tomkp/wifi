@@ -66,7 +66,9 @@ const Signal = ({ value }: ValueProps) => {
     return (
         <section className="signal">
             <span className="label">Signal</span>
-            <span className="value">{value}</span>
+            <span className="value">
+                {value}<span className="max">/100</span>
+            </span>
         </section>
     );
 };
@@ -75,7 +77,9 @@ const Noise = ({ value }: ValueProps) => {
     return (
         <section className="noise">
             <span className="label">Noise</span>
-            <span className="value">{value}</span>
+            <span className="value">
+                {value}<span className="max">/100</span>
+            </span>
         </section>
     );
 };
@@ -84,7 +88,9 @@ const Quality = ({ value }: ValueProps) => {
     return (
         <section className="quality" style={{ background: toColor(value, 25) }}>
             <span className="label">Quality</span>
-            <span className="value">{value}</span>
+            <span className="value">
+                {value}<span className="max">/100 dB</span>
+            </span>
         </section>
     );
 };
