@@ -1,20 +1,14 @@
 import { exec } from 'child_process';
 import { EventEmitter } from 'events';
+import path from 'path';
 
-interface AirPortInterface {
-    _name: string;
-    spairport_status_information?: string;
-    spairport_current_network_information?: {
-        _name: string;
-        spairport_signal_noise: string;
-        spairport_network_channel: string;
-    };
-}
-
-interface SystemProfilerData {
-    SPAirPortDataType?: Array<{
-        spairport_airport_interfaces?: AirPortInterface[];
-    }>;
+interface WifiHelperResult {
+    status: 'off' | 'not-connected' | 'connected';
+    ssid?: string;
+    rssi?: number;
+    noise?: number;
+    channel?: number;
+    error?: string;
 }
 
 interface WifiOffResult {
@@ -37,80 +31,62 @@ export type WifiResult = WifiOffResult | WifiNotConnectedResult | WifiConnectedR
 
 const events = new EventEmitter();
 
-export const parseSignalNoise = (signalNoise: string): { rssi: number; noise: number } => {
-    const match = signalNoise.match(/(-?\d+)\s*dBm\s*\/\s*(-?\d+)\s*dBm/);
-    if (match) {
+export const parseWifiHelperOutput = (output: string): WifiResult => {
+    try {
+        const data: WifiHelperResult = JSON.parse(output);
+
+        if (data.error || data.status === 'off') {
+            return { status: 'off' };
+        }
+
+        if (data.status === 'not-connected') {
+            return { status: 'not-connected' };
+        }
+
         return {
-            rssi: parseInt(match[1], 10),
-            noise: parseInt(match[2], 10)
+            status: 'connected',
+            ssid: data.ssid ?? '',
+            rssi: data.rssi ?? 0,
+            noise: data.noise ?? 0,
+            channel: String(data.channel ?? '')
         };
+    } catch {
+        return { status: 'off' };
     }
-    return { rssi: 0, noise: 0 };
 };
 
-export const parseChannel = (channel: string): string => {
-    const match = channel.match(/^(\d+)/);
-    return match ? match[1] : '';
-};
-
-export const parseSystemProfilerData = (data: SystemProfilerData): WifiResult => {
-    const airports = data.SPAirPortDataType?.[0]?.spairport_airport_interfaces;
-    if (!airports || airports.length === 0) {
-        return { status: 'off' };
+const getHelperPath = (): string => {
+    // In development, use the resources folder
+    // In production (packaged), it will be in the app's resources
+    const isDev = process.env.NODE_ENV === 'development' || !process.resourcesPath;
+    if (isDev) {
+        return path.join(__dirname, '..', 'resources', 'wifi-info');
     }
-
-    const wifiInterface = airports.find((iface) => iface._name === 'en0');
-    if (!wifiInterface) {
-        return { status: 'off' };
-    }
-
-    const status = wifiInterface.spairport_status_information;
-    if (status === 'spairport_status_off') {
-        return { status: 'off' };
-    }
-
-    const currentNetwork = wifiInterface.spairport_current_network_information;
-    if (!currentNetwork) {
-        return { status: 'not-connected' };
-    }
-
-    const { rssi, noise } = parseSignalNoise(currentNetwork.spairport_signal_noise);
-    const channel = parseChannel(currentNetwork.spairport_network_channel);
-
-    return {
-        status: 'connected',
-        ssid: currentNetwork._name,
-        rssi,
-        noise,
-        channel
-    };
+    return path.join(process.resourcesPath, 'wifi-info');
 };
 
 const poll = (): void => {
-    exec('system_profiler SPAirPortDataType -json', (error, stdout) => {
+    const helperPath = getHelperPath();
+
+    exec(`"${helperPath}"`, (error, stdout) => {
         if (error) {
             events.emit('error', error);
             return;
         }
 
-        try {
-            const data: SystemProfilerData = JSON.parse(stdout);
-            const result = parseSystemProfilerData(data);
+        const result = parseWifiHelperOutput(stdout);
 
-            if (result.status === 'off') {
-                events.emit('off');
-            } else if (result.status === 'not-connected') {
-                events.emit('not-connected');
-            } else {
-                events.emit('data', {
-                    rssi: result.rssi,
-                    noise: result.noise,
-                    channel: result.channel,
-                    ssid: result.ssid
-                });
-            }
-        } catch {
-            events.emit('error', new Error('Failed to parse system_profiler output'));
+        if (result.status === 'off') {
+            events.emit('off');
+        } else if (result.status === 'not-connected') {
+            events.emit('not-connected');
+        } else {
+            events.emit('data', {
+                rssi: result.rssi,
+                noise: result.noise,
+                channel: result.channel,
+                ssid: result.ssid
+            });
         }
     });
 };

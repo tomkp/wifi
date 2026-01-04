@@ -5,3 +5,4 @@ dist
 .vite
 out
 coverage
+resources/wifi-info
