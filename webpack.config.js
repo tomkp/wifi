@@ -1,34 +1,36 @@
 const path = require('path');
-const webpack = require('webpack');
-const webpackTargetElectronRenderer = require('webpack-target-electron-renderer');
 
-var config = {
-    devtool: 'cheap-module-eval-source-map',
-    debug: true,
-    entry: ['./ui/Application.js'],
+module.exports = {
+    entry: './ui/Application.js',
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js'
     },
+    target: 'electron-renderer',
+    devtool: 'source-map',
     module: {
-        loaders: [
-            {
-                test: /\.scss$|\.css$/,
-                loader: 'style-loader!css-loader!postcss-loader'
-            },
+        rules: [
             {
                 test: /\.jsx?$/,
-                exclude: /(node_modules|bower_components)/,
-                loader: 'babel'
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env', '@babel/preset-react']
+                    }
+                }
+            },
+            {
+                test: /\.scss$/,
+                use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader']
+            },
+            {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader', 'postcss-loader']
             }
         ]
     },
-    plugins: [new webpack.optimize.OccurenceOrderPlugin(), new webpack.NoErrorsPlugin()],
-    postcss: function () {
-        return [require('precss'), require('autoprefixer')];
+    resolve: {
+        extensions: ['.js', '.jsx']
     }
 };
-
-config.target = webpackTargetElectronRenderer(config);
-
-module.exports = config;
