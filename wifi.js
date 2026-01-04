@@ -1,6 +1,7 @@
 const spawn = require('child_process').spawn;
 const split = require('split');
-const airport = '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport';
+const airport =
+    '/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport';
 const EventEmitter = require('events').EventEmitter;
 const events = new EventEmitter();
 
@@ -35,8 +36,7 @@ const poll = () => {
     let data = {};
 
     spawn(airport, ['-I'])
-        .stdout
-        .pipe(split())
+        .stdout.pipe(split())
         .on('data', function (line) {
             const parsed = parseLine(line);
             if (parsed) {
@@ -59,7 +59,6 @@ const poll = () => {
             }
         });
 };
-
 
 let intervalId = null;
 
