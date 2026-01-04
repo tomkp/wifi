@@ -1,6 +1,6 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
-import wifi from './wifi';
+import wifi, { start as startWifi, stop as stopWifi } from './wifi';
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
@@ -37,9 +37,13 @@ function createWindow(): void {
     monitor(mainWindow);
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+    createWindow();
+    startWifi();
+});
 
 app.on('window-all-closed', () => {
+    stopWifi();
     if (process.platform !== 'darwin') {
         app.quit();
     }
