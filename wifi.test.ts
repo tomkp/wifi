@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { parseLine, parseWifiData } from './wifi';
 
 describe('wifi module', () => {

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { bound, convert } from './Colors';
 import fraction from './Colors';
 
